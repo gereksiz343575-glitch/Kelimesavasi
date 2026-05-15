@@ -279,16 +279,18 @@ export default function Game() {
   const theme = myScore > oppScore ? "blue" : oppScore > myScore ? "red" : "zinc";
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-900 border-zinc-800 transition-colors duration-1000 relative">
+    <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-950 border-zinc-900 transition-colors duration-1000 relative">
       {/* Background gradients for flavor */}
       <div className={`absolute top-0 left-0 w-full h-64 bg-gradient-to-b opacity-40 transition-colors duration-1000 pointer-events-none 
-        ${theme === 'blue' ? 'from-blue-600/20' : theme === 'red' ? 'from-red-600/20' : 'from-zinc-500/10'} to-transparent z-0`}></div>
+        ${theme === 'blue' ? 'from-blue-600/20' : theme === 'red' ? 'from-red-600/10' : 'from-zinc-500/10'} to-transparent z-0`}></div>
       
-      <div className="p-4 flex items-center justify-between z-10">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="hover:bg-zinc-800 text-zinc-300 focus:bg-zinc-800 shadow-none ring-0">
+      <div className="absolute top-4 sm:top-5 left-4 sm:left-5 z-50 pointer-events-auto">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex flex-col items-center">
+      </div>
+      
+      <div className="p-4 flex flex-col items-center justify-center z-10 pt-16 sm:pt-4 pointer-events-none">
             {game.status === 'active' && (
                <div className={`flex flex-col items-center bg-zinc-950/80 px-5 py-2 rounded-2xl border border-white/5 shadow-xl backdrop-blur-md transition-colors duration-500 ${timeLeft <= 10 ? 'ring-1 ring-red-500/50 shadow-red-500/20' : ''}`}>
                  <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-0.5">Kalan Süre</span>
@@ -298,8 +300,6 @@ export default function Game() {
                </div>
             )}
         </div>
-        <div className="w-10"></div> {/* Spacer to center the timer */}
-      </div>
 
       { (game.status === "waiting" || game.status === "invited" || game.status === "looking") && (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4 z-10">
@@ -315,10 +315,10 @@ export default function Game() {
 
       {game.status !== "waiting" && game.status !== "invited" && game.status !== "looking" && (
         <>
-          <div className="px-6 py-2 z-10 shrink-0">
+          <div className="px-4 sm:px-6 py-2 z-10 shrink-0">
              <div className={`flex justify-between items-center p-5 rounded-3xl shadow-lg transition-all duration-700 relative overflow-hidden
                  ${theme === 'blue' ? 'bg-gradient-to-br from-blue-900/40 to-blue-950/40 border border-blue-800/40 shadow-[0_8px_30px_rgba(37,99,235,0.15)]' : 
-                   theme === 'red' ? 'bg-gradient-to-br from-red-900/40 to-red-950/40 border border-red-800/40 shadow-[0_8px_30px_rgba(220,38,38,0.15)]' : 
+                   theme === 'red' ? 'bg-zinc-950/40 border border-red-900/20 shadow-[0_8px_30px_rgba(220,38,38,0.05)]' : 
                    'bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-700/50 shadow-[0_8px_30px_rgba(0,0,0,0.2)]'} backdrop-blur-md`}>
                  <div className="flex flex-col items-center w-1/3 z-10 relative">
                     <span className={`text-[10px] uppercase font-black tracking-widest mb-1.5 transition-colors duration-500 ${theme === 'blue' ? 'text-blue-400/70' : theme === 'red' ? 'text-red-400/70' : 'text-zinc-500'}`}>Kategori</span>
@@ -335,11 +335,11 @@ export default function Game() {
              </div>
           </div>
 
-          <div className="flex-1 overflow-hidden p-6 pt-2 z-10 flex flex-col">
+          <div className="flex-1 overflow-hidden px-4 sm:px-6 pt-2 pb-2 z-10 flex flex-col">
             <div className={`flex flex-col flex-1 rounded-3xl overflow-hidden border shadow-2xl transition-all duration-700 backdrop-blur-sm
-                ${myScore > oppScore ? 'bg-blue-950/20 border-blue-900/30 shadow-blue-900/5' : oppScore > myScore ? 'bg-red-950/20 border-red-900/30 shadow-red-900/5' : 'bg-zinc-950/50 border-zinc-800/80 shadow-black/20'}`}>
+                ${myScore > oppScore ? 'bg-blue-950/20 border-blue-900/30 shadow-blue-900/5' : oppScore > myScore ? 'bg-zinc-950/40 border-red-900/10 shadow-red-900/5' : 'bg-zinc-950/50 border-zinc-800/80 shadow-black/20'}`}>
                 <div className={`p-4 font-medium flex items-center justify-between border-b transition-all duration-700
-                    ${myScore > oppScore ? 'bg-blue-900/20 border-blue-900/20' : oppScore > myScore ? 'bg-red-900/20 border-red-900/20' : 'bg-zinc-900/50 border-zinc-800/50'}
+                    ${myScore > oppScore ? 'bg-blue-900/20 border-blue-900/20' : oppScore > myScore ? 'bg-red-950/30 border-red-900/20' : 'bg-zinc-900/50 border-zinc-800/50'}
                 `}>
                     <span className={`transition-all duration-500 flex items-center gap-2 ${myScore > oppScore ? 'text-blue-400 scale-105 font-black drop-shadow-[0_0_12px_rgba(59,130,246,0.6)] origin-left' : myScore < oppScore ? 'text-red-400/60 font-bold' : 'text-zinc-400 font-bold'}`}>
                       Sen: <span className="text-xl">{myScore}</span>
@@ -368,7 +368,7 @@ export default function Game() {
                                 : 'bg-zinc-800 border-zinc-700/50 text-zinc-100 rounded-tl-sm'}
                             `}>
                                 <span className="break-all">{item.word}</span>
-                                {item.status === 'correct' && <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${item.isMine ? 'text-blue-400 drop-shadow' : 'text-blue-500'}`}/>}
+                                {item.status === 'correct' && <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${item.isMine ? 'text-emerald-400 drop-shadow' : 'text-emerald-500'}`}/>}
                                 {item.status === 'wrong' && item.isMine && <XCircle className="w-4 h-4 text-red-400 flex-shrink-0"/>}
                             </div>
                         </motion.div>
@@ -378,7 +378,7 @@ export default function Game() {
             </div>
           </div>
 
-          <div className="p-4 bg-zinc-900 border-t border-white/5 shrink-0 z-20">
+          <div className="px-4 pt-4 bg-zinc-900 border-t border-white/5 shrink-0 z-20" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
             {game.status === "active" ? (
               <form onSubmit={handleSubmit} className="flex space-x-3 relative items-center max-w-sm mx-auto">
                 <Input 
@@ -395,20 +395,20 @@ export default function Game() {
               </form>
             ) : game.status === "finished" ? (
               <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} 
-                className={`flex flex-col items-center p-6 rounded-2xl border shadow-2xl 
-                ${amIWinner ? 'bg-blue-950/40 border-blue-900/50' : isDraw ? 'bg-zinc-950 border-zinc-800' : 'bg-rose-950/40 border-rose-900/50'}`}>
+                className={`flex flex-col items-center p-6 rounded-3xl border shadow-2xl w-full
+                ${amIWinner ? 'bg-gradient-to-b from-blue-950/40 to-zinc-950/80 border-blue-900/20 shadow-[0_0_40px_rgba(30,58,138,0.15)]' : isDraw ? 'bg-zinc-950/80 border-white/5' : 'bg-gradient-to-b from-rose-950/40 to-zinc-950/80 border-rose-900/20 shadow-[0_0_40px_rgba(225,29,72,0.1)]'} backdrop-blur-md`}>
                 
-                <Trophy className={`w-16 h-16 mb-3 drop-shadow-lg ${amIWinner ? 'text-blue-400' : isDraw ? 'text-zinc-400' : 'text-rose-400'}`} />
+                <Trophy className={`w-16 h-16 mb-4 drop-shadow-[0_0_15px_currentColor] ${amIWinner ? 'text-blue-400' : isDraw ? 'text-zinc-400' : 'text-rose-400'}`} />
                 
-                <div className={`text-2xl font-black uppercase tracking-widest text-center ${amIWinner ? 'text-blue-400' : isDraw ? 'text-zinc-300' : 'text-rose-400'}`}>
+                <div className={`text-2xl font-black uppercase tracking-widest text-center drop-shadow-md ${amIWinner ? 'text-blue-400' : isDraw ? 'text-zinc-300' : 'text-rose-400'}`}>
                   {isDraw ? 'BERABERLİK!' : amIWinner ? 'SEN KAZANDIN!' : 'RAKİP KAZANDI!'}
                 </div>
                 
-                <div className="mt-2 text-zinc-400 text-sm font-medium">
+                <div className="mt-2 text-zinc-400 text-sm font-bold tracking-wider">
                   Skor: {myScore} - {oppScore}
                 </div>
                 
-                <Button variant="outline" className="mt-6 w-full max-w-xs h-12 rounded-xl border-zinc-700 hover:bg-zinc-800" onClick={() => navigate("/menu")}>
+                <Button variant="outline" className="mt-8 w-full h-14 rounded-2xl bg-zinc-900/80 border-white/10 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all shadow-sm font-black text-[15px]" onClick={() => navigate("/menu")}>
                     Ana Menüye Dön
                 </Button>
               </motion.div>

@@ -45,16 +45,20 @@ export default function Leaderboard() {
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-900/50">
-      <div className="p-5 border-b border-white/5 flex items-center shadow-lg bg-zinc-900/80 z-10 shrink-0">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="mr-4 hover:bg-zinc-800 text-zinc-300">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+      {/* Back Button */}
+      <div className="absolute top-4 sm:top-5 left-4 sm:left-5 z-50 pointer-events-auto">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
+             <ArrowLeft className="h-5 w-5" />
+          </Button>
+      </div>
+
+      <div className="p-4 sm:p-5 pt-16 sm:pt-16 border-b border-white/5 flex items-center justify-center shadow-lg bg-zinc-900/80 z-10 shrink-0">
         <h1 className="font-extrabold text-xl flex items-center text-amber-500">
           <Trophy className="mr-2 h-6 w-6" /> Sıralama
         </h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 relative pb-8">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 relative" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
         {loading ? (
           <div className="flex justify-center py-12">
              <div className="w-10 h-10 rounded-full border-4 border-amber-500/20 border-t-amber-500 animate-spin" />

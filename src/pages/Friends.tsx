@@ -170,14 +170,18 @@ export default function Friends() {
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-900/50">
-      <div className="p-4 border-b border-white/5 flex items-center bg-zinc-900/80">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="mr-2 hover:bg-zinc-800 text-zinc-300">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+      {/* Back Button */}
+      <div className="absolute top-4 sm:top-5 left-4 sm:left-5 z-50 pointer-events-auto">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
+             <ArrowLeft className="h-5 w-5" />
+          </Button>
+      </div>
+
+      <div className="p-4 pt-16 sm:pt-16 border-b border-white/5 flex items-center justify-center bg-zinc-900/80">
         <h1 className="font-bold text-lg text-white">Arkadaşlar</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 pb-20">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6" style={{ paddingBottom: 'max(5rem, env(safe-area-inset-bottom))' }}>
         <form onSubmit={handleSearch} className="space-y-3">
           <div className="flex space-x-3">
             <Input 

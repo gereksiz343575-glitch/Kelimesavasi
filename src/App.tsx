@@ -28,7 +28,7 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-[100dvh] flex items-center justify-center bg-zinc-950 sm:p-4 text-zinc-50">
+      <div className="min-h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex items-center justify-center bg-zinc-950 sm:p-4 text-zinc-50">
         <div className="w-full h-[100dvh] sm:h-[800px] sm:max-h-[90vh] max-w-md bg-zinc-900 flex flex-col sm:rounded-3xl sm:border border-white/10 shadow-2xl overflow-hidden relative">
           <Routes>
             <Route path="/" element={user ? <Navigate to="/menu" /> : <Login />} />

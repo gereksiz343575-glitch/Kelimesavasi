@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, updateDoc, onSnapshot, collection, query, getDocs } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import { Button } from "../components/ui/Button";
-import { Settings, Play, ArrowLeft, Users, UserPlus, X } from "lucide-react";
+import { Settings, Play, ArrowLeft, Users, UserPlus, X, ChevronDown, ChevronUp } from "lucide-react";
 import { motion } from "framer-motion";
 import { CATEGORIES } from "../data/categories";
 import AvatarScene from "../components/AvatarScene";
@@ -15,6 +15,7 @@ export default function Party() {
   const [friends, setFriends] = useState<any[]>([]);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const isOwner = party?.player1Id === auth.currentUser?.uid;
 
@@ -95,14 +96,18 @@ export default function Party() {
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-950 relative">
       
+      {/* Back Button */}
+      <div className="absolute top-4 sm:top-5 left-4 sm:left-5 z-50 pointer-events-auto">
+          <Button variant="ghost" size="icon" onClick={leaveParty} className="bg-zinc-900/80 hover:bg-red-500 hover:text-white text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
+             <ArrowLeft className="h-5 w-5" />
+          </Button>
+      </div>
+
       {/* Top Bar */}
-      <div className="p-5 flex items-center justify-between z-10 shrink-0 relative">
+      <div className="p-3 sm:p-5 pt-16 sm:pt-16 flex items-center justify-center z-10 shrink-0 relative bg-zinc-950/40 backdrop-blur-sm border-b border-white/5">
         <div className="flex items-center">
-            <Button variant="ghost" size="icon" onClick={leaveParty} className="mr-3 bg-zinc-900/80 hover:bg-red-500/80 hover:text-white text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg pointer-events-auto">
-               <ArrowLeft className="h-5 w-5" />
-            </Button>
             <h1 className="font-black text-xl flex items-center text-white drop-shadow-md tracking-tight">
-               <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-1.5 rounded-xl mr-3 shadow-lg shadow-blue-500/30 border border-white/10 ring-1 ring-black/20">
+               <div className="bg-zinc-800 text-zinc-300 p-1.5 rounded-xl mr-3 shadow-md border border-white/10 ring-1 ring-black/20">
                  <Users className="h-5 w-5" />
                </div>
                PARTİ LOBİSİ
@@ -118,7 +123,7 @@ export default function Party() {
         />
 
         {/* Floating Name Tags */}
-        <div className="absolute top-[10%] left-0 right-0 flex justify-between px-8 z-10 pointer-events-none">
+        <div className="absolute bottom-4 left-0 right-0 flex justify-between items-end px-4 sm:px-8 z-10 pointer-events-none">
             <div className="flex flex-col items-center pointer-events-auto">
                <span className="bg-zinc-950/80 backdrop-blur-sm text-blue-400 font-bold px-4 py-1.5 rounded-full border border-blue-500/30 shadow-lg">{party.player1Name}</span>
                {isOwner && (
@@ -146,8 +151,8 @@ export default function Party() {
                     )}
                   </>
                ) : (
-                  <button onClick={() => isOwner && setShowInviteModal(true)} disabled={!isOwner} className="bg-zinc-900/80 backdrop-blur-md border border-dashed border-zinc-500 hover:border-white hover:bg-zinc-800 text-zinc-300 rounded-2xl px-5 py-3 font-bold flex items-center transition-all shadow-lg group pointer-events-auto">
-                      <UserPlus className="w-5 h-5 mr-2" /> Arkadaş Davet Et
+                  <button onClick={() => isOwner && setShowInviteModal(true)} disabled={!isOwner} className="bg-zinc-900/60 backdrop-blur-md border border-dashed border-zinc-600/50 hover:border-zinc-400 hover:bg-zinc-800/80 text-zinc-400 text-[13px] rounded-full px-4 py-1.5 font-semibold flex items-center transition-all group pointer-events-auto">
+                      <UserPlus className="w-4 h-4 mr-2" /> Arkadaş Davet Et
                   </button>
                )}
             </div>
@@ -155,17 +160,26 @@ export default function Party() {
       </div>
 
       {/* Bottom CS2-style Panel */}
-      <div className="relative z-20 shrink-0 bg-zinc-950 px-4 pb-4 pt-2">
-         <div className="absolute bottom-full left-0 right-0 h-24 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none" />
-         <div className="flex flex-col space-y-3 relative z-10 pointer-events-auto">
+      <div className="relative z-20 shrink-0 bg-zinc-950/80 backdrop-blur-md px-4 pt-4 border-t border-white/10" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+         <div className="absolute bottom-full left-0 right-0 h-16 bg-gradient-to-t from-zinc-950/80 to-transparent pointer-events-none" />
+         <div className="flex flex-col space-y-3 relative z-10 pointer-events-auto max-w-sm mx-auto w-full pb-2">
               
               {/* Settings Section */}
-              <div className="bg-zinc-900/60 backdrop-blur-xl rounded-2xl p-4 border border-white/10 shadow-2xl space-y-3 max-w-sm mx-auto w-full">
-                  <div className="flex items-center text-zinc-300 font-bold text-xs tracking-widest uppercase ml-1">
-                      <Settings className="w-3 h-3 mr-2" /> Oda Ayarları
-                  </div>
+              <div className="bg-zinc-900/60 rounded-2xl p-4 border border-white/10 shadow-2xl w-full transition-all">
+                  <button 
+                    className="flex w-full items-center justify-between text-zinc-300 font-bold text-xs tracking-widest uppercase focus:outline-none px-1"
+                    onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                  >
+                      <div className="flex items-center">
+                          <Settings className="w-4 h-4 mr-2" /> Oda Ayarları
+                      </div>
+                      <div className="text-zinc-500">
+                          {isSettingsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </div>
+                  </button>
                   
-                  <div className="space-y-3">
+                  {isSettingsOpen && (
+                  <div className="space-y-4 mt-4 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-2 duration-300">
                       {/* Süre */}
                       <div>
                           <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1 mb-1.5 block">Süre Limit</label>
@@ -218,6 +232,7 @@ export default function Party() {
                           </div>
                       </div>
                   </div>
+                  )}
               </div>
 
               {/* Start Button */}

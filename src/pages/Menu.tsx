@@ -16,6 +16,24 @@ export default function Menu() {
   useEffect(() => {
     if (!auth.currentUser) return;
     
+    // Cancel any abandoned quick matches from this user
+    const cleanupAbandoned = async () => {
+      try {
+        const qAbandoned = query(
+          collection(db, "games"),
+          where("player1Id", "==", auth.currentUser?.uid),
+          where("status", "==", "looking")
+        );
+        const snapshot = await getDocs(qAbandoned);
+        snapshot.forEach((d) => {
+          updateDoc(doc(db, "games", d.id), { status: "cancelled", updatedAt: serverTimestamp() });
+        });
+      } catch (e) {
+        console.error("Cleanup error", e);
+      }
+    };
+    cleanupAbandoned();
+
     // Listen for current user's wins
     const userUnsub = onSnapshot(doc(db, "users", auth.currentUser.uid), async (docSnap) => {
       if (docSnap.exists()) {
@@ -100,27 +118,38 @@ export default function Menu() {
       const q = query(
         collection(db, "games"), 
         where("status", "==", "looking"), 
-        limit(1)
+        limit(5)
       );
       const snapshot = await getDocs(q);
       
       let matchedGameId = null;
 
       if (!snapshot.empty) {
-        const gameDocRef = doc(db, "games", snapshot.docs[0].id);
-        
-        await runTransaction(db, async (transaction) => {
-           const sfDoc = await transaction.get(gameDocRef);
-           if (!sfDoc.exists() || sfDoc.data().status !== "looking") {
-             throw new Error("Oyun zaten alınmış");
-           }
-           transaction.update(gameDocRef, {
-              status: "waiting",
-              player2Id: auth.currentUser?.uid,
-              updatedAt: serverTimestamp()
-           });
-           matchedGameId = sfDoc.id;
-        });
+        for (const d of snapshot.docs) {
+          const gameData = d.data();
+          // Skip if it's our own game or older than 2 minutes (abandoned)
+          if (gameData.player1Id === auth.currentUser.uid) continue;
+          if (gameData.updatedAt && Date.now() - gameData.updatedAt.toMillis() > 2 * 60 * 1000) continue;
+
+          const gameDocRef = doc(db, "games", d.id);
+          try {
+            await runTransaction(db, async (transaction) => {
+               const sfDoc = await transaction.get(gameDocRef);
+               if (!sfDoc.exists() || sfDoc.data().status !== "looking") {
+                 throw new Error("taken");
+               }
+               transaction.update(gameDocRef, {
+                  status: "waiting",
+                  player2Id: auth.currentUser?.uid,
+                  updatedAt: serverTimestamp()
+               });
+               matchedGameId = sfDoc.id;
+            });
+            if (matchedGameId) break;
+          } catch (e) {
+            // "taken", move to next doc in loop
+          }
+        }
       }
       
       if (matchedGameId) {
@@ -143,11 +172,6 @@ export default function Menu() {
       }
     } catch(err) {
       console.error(err);
-      
-      if ((err as Error).message === "Oyun zaten alınmış") {
-         setTimeout(() => handleQuickMatch(), 500);
-         return; 
-      }
       setLoadingMatch(false);
     }
   };
@@ -156,15 +180,32 @@ export default function Menu() {
     if (!auth.currentUser) return;
     setLoadingMatch(true);
     try {
+      // Pick 3 random categories for the bot game
+      const CATEGORIES = (await import('../data/categories')).CATEGORIES;
+      const LETTERS = (await import('../data/categories')).LETTERS;
+      const { getPossibleWords } = await import('../lib/wordDb');
+      
+      const shuffledCategories = [...CATEGORIES].sort(() => 0.5 - Math.random());
+      const selectedCategories = shuffledCategories.slice(0, 3);
+      const category = selectedCategories.join(', ');
+      
+      // Filter letters
+      let validLetters = LETTERS.filter(l => getPossibleWords(category, l).length > 0);
+      if (validLetters.length === 0) validLetters = ["A"];
+      const letter = validLetters[Math.floor(Math.random() * validLetters.length)];
+
       const newGame = await addDoc(collection(db, "games"), {
-        status: "waiting", // Go straight to waiting so Game.tsx can start it
+        status: "active", // Go straight to active
         player1Id: auth.currentUser.uid,
         player1Name: auth.currentUser.displayName,
         player2Id: "bot",
         player2Name: "Bilgisayar",
         turn: auth.currentUser.uid,
-        category: "",
-        letter: "",
+        category,
+        letter,
+        partyMode: "simultaneous",
+        partyDuration: 60,
+        endsAt: Date.now() + 60 * 1000,
         player1Words: [],
         player2Words: [],
         createdAt: serverTimestamp(),
@@ -215,26 +256,41 @@ export default function Menu() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-zinc-950 to-zinc-950 pointer-events-none" />
       <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '32px 32px' }} />
 
-      <div className="p-6 pb-5 border-b border-white/5 flex items-center justify-between bg-zinc-900/50 backdrop-blur-md z-10 shrink-0">
-        <div className="flex items-center space-x-4">
-            <div>
-            <h1 className="font-extrabold text-2xl flex items-center gap-2 text-white">
-                Ana Menü
-                {shortId && <span className="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-full ring-1 ring-white/10 font-medium">#{shortId}</span>}
-            </h1>
-            <p className="text-zinc-400 text-sm mt-0.5">Merhaba, <span className="text-blue-400 font-bold">{auth.currentUser?.displayName}</span></p>
-            </div>
-            <div className="flex flex-col items-center bg-zinc-950/80 rounded-xl px-4 py-2 ring-1 ring-white/10 shadow-lg">
-                <span className="text-[9px] text-zinc-500 font-black tracking-widest uppercase mb-0.5">KAZANMA</span>
-                <span className="text-emerald-400 font-black text-xl leading-none">{wins}</span>
-            </div>
-        </div>
-        <Button variant="ghost" size="icon" onClick={handleLogout} title="Çıkış Yap" className="hover:bg-red-500/80 hover:text-white text-zinc-400 bg-zinc-900/60 transition-all border border-white/5">
-          <LogOut className="h-5 w-5" />
+      {/* Logout Button */}
+      <div className="absolute top-4 sm:top-5 right-4 sm:right-5 z-50 pointer-events-auto">
+        <Button variant="ghost" size="icon" onClick={handleLogout} title="Çıkış Yap" className="bg-zinc-900/80 hover:bg-red-500 hover:text-white text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
+          <LogOut className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 pb-10 flex flex-col justify-end relative z-10 w-full max-w-sm mx-auto pointer-events-none">
+      <div className="p-3 sm:p-4 pt-16 sm:pt-16 border-b border-white/5 flex items-center justify-between bg-zinc-900/50 backdrop-blur-md z-10 shrink-0">
+        <div className="flex items-center space-x-3">
+          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg border border-white/10">
+            <span className="text-white font-black text-lg">S</span>
+          </div>
+          <div className="flex flex-col">
+            <h1 className="font-extrabold text-lg flex items-center gap-2 text-white leading-none">
+                Sözcük Meydanı
+            </h1>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-zinc-400 text-xs">Merhaba, <span className="text-blue-400 font-bold">{auth.currentUser?.displayName}</span></p>
+              {shortId && (
+                <div className="flex items-center bg-zinc-800/80 text-white px-1.5 py-0.5 rounded text-[10px] font-mono border border-white/10 shadow-sm">
+                  <span className="text-zinc-500 mr-1">ID:</span>
+                  <span className="font-bold tracking-wider">{shortId}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex flex-col items-center bg-zinc-950/80 rounded-lg px-3 py-1 ring-1 ring-white/10 shadow-md">
+            <span className="text-[8px] text-zinc-500 font-black tracking-widest uppercase mb-0.5">KAZANMA</span>
+            <span className="text-emerald-400 font-black text-base leading-none">{wins}</span>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 flex flex-col justify-end relative z-10 w-full max-w-sm mx-auto pointer-events-none" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
         {invites.length > 0 && (
           <div className="bg-zinc-900/80 backdrop-blur-xl p-4 rounded-2xl border border-blue-500/30 space-y-3 shadow-[0_0_20px_rgba(59,130,246,0.15)] pointer-events-auto">
             <h2 className="text-sm font-bold flex items-center text-blue-400">
@@ -260,7 +316,7 @@ export default function Menu() {
         )}
 
         <div className="bg-zinc-900/40 backdrop-blur-md p-4 rounded-3xl border border-white/10 space-y-4 pointer-events-auto shadow-2xl">
-            <Button className="w-full h-14 text-[15px] font-black rounded-2xl bg-blue-500 hover:bg-blue-400 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all border border-blue-400/50 hover:scale-[1.02]" onClick={handleQuickMatch} disabled={loadingMatch}>
+            <Button className="w-full h-14 text-[15px] font-black rounded-2xl bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all border border-blue-500/50 hover:scale-[1.02]" onClick={handleQuickMatch} disabled={loadingMatch}>
             {loadingMatch ? (
                 <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin mr-2"></div>
             ) : (
@@ -269,20 +325,20 @@ export default function Menu() {
             HIZLI BAŞLA
             </Button>
 
-            <Button variant="outline" className="w-full h-14 text-[15px] font-black rounded-2xl bg-zinc-950/80 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all shadow-inner hover:scale-[1.02]" onClick={handleBotMatch} disabled={loadingMatch}>
+            <Button variant="outline" className="w-full h-14 text-[15px] font-black rounded-2xl bg-zinc-900/80 border-white/10 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all shadow-sm hover:scale-[1.02]" onClick={handleBotMatch} disabled={loadingMatch}>
             <Bot className="mr-2 h-5 w-5" /> BİLGİSAYARA KARŞI
             </Button>
 
-            <Button variant="outline" className="w-full h-14 text-[15px] font-black rounded-2xl bg-zinc-950/80 border-purple-500/30 text-purple-400 hover:bg-purple-500 hover:text-white transition-all shadow-inner hover:scale-[1.02]" onClick={handleCustomMatch} disabled={loadingMatch}>
+            <Button variant="outline" className="w-full h-14 text-[15px] font-black rounded-2xl bg-zinc-900/80 border-white/10 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all shadow-sm hover:scale-[1.02]" onClick={handleCustomMatch} disabled={loadingMatch}>
             <Users className="mr-2 h-5 w-5" /> ÖZEL OYUN (PARTİ)
             </Button>
 
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-white/5 mt-2">
-            <Button variant="outline" className="h-14 text-[14px] font-black rounded-2xl bg-zinc-950/80 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all shadow-inner" onClick={() => navigate("/friends")}>
+            <Button variant="outline" className="h-14 text-[14px] font-black rounded-2xl bg-zinc-900/80 border-white/10 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all shadow-sm" onClick={() => navigate("/friends")}>
                 <Users className="mr-2 h-5 w-5" /> Arkadaşlar
             </Button>
             
-            <Button variant="outline" className="h-14 text-[14px] font-black rounded-2xl bg-zinc-950/80 border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-white transition-all shadow-inner" onClick={() => navigate("/leaderboard")}>
+            <Button variant="outline" className="h-14 text-[14px] font-black rounded-2xl bg-zinc-900/80 border-white/10 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all shadow-sm" onClick={() => navigate("/leaderboard")}>
                 <Trophy className="mr-2 h-5 w-5" /> Sıralama
             </Button>
             </div>
