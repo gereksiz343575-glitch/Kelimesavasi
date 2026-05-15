@@ -1,0 +1,16 @@
+export const hayvanlar = [
+    "ASLAN", "AYI", "AT", "AKREP", "AHTAPOT", "ARIKUŞU", "ARI", "ANTİLOP", "ANAKONDA", "ALBATROS", "AĞAÇKAKAN", "AKBABA", "ARMADİLLO",
+    "BALİNA", "BÖCEK", "BAYKUŞ", "BÜLBÜL", "BOA", "BOZAYI", "BABUN", "BALIK", "BİBİTO", "BORSUK", "BİGAC", "BOKBÖCEĞİ", "BİZON",
+    "CEYLAN", "CİVCİV", "CIRLAK", "CENNETKUŞU", "ÇAKAL", "ÇİTA", "ÇEKİRGE", "ÇINGIRAKLIYILAN", "ÇİNÇİLA", 
+    "DEVE", "DOMUZ", "DİNOZOR", "DENİZANASI", "DANA", "DENİZATI", "DENİZYILDIZI", "DİNGİ", "DOĞAN", 
+    "EŞEK", "EŞŞEK", "EGUANA", "FİL", "FARE", "FOK", "FİNÇKUŞU", "GEYİK", "GORİL", "GERGEDAN", "GÜVERCİN", "GELİNCİK", "GÜVE",
+    "HİNDİ", "HOROZ", "HAMSİ", "HİPOKAMP", "HİPOTAM", "HİPO", "HOTOZ", "İGUANA", "İNEK", "İSTİRİDYE", "İSTAKOZ",
+    "JAGUAR", "KEDİ", "KÖPEK", "KURT", "KUŞ", "KAPLAN", "KAPLUMBAĞA", "KARTAL", "KOYUN", "KEÇİ", "KUNDUZ", "KARINCA", "KOALA",
+    "KELEBEK", "KERTENKELE", "KANGURU", "KUNDUZ", "KUNDUZ", "KARINCAYİYEN", "KAKADU", "KELAYNAK", "KOLİBRİ", 
+    "LEYLEK", "LEOPAR", "LAMA", "MAMUT", "MAYMUN", "MARTI", "MANDA", "MÜREKKEPBALIĞI", "MORS", "MİDYE",
+    "ORANGUTAN", "ÖRÜMCEK", "ÖRDEK", "ÖKÜZ", "PANDA", "PENGUEN", "PUMA", "PAPAĞAN", "PİRE", "PORSUK", "PİTON", "PELİKAN",
+    "SOLUCAN", "SALYANGOZ", "SİVRİSİNEK", "SİNCAP", "SAMUR", "ŞEMPANZE", "ŞAHİN", 
+    "TAVUK", "TAVŞAN", "TİLKİ", "TİMSAH", "TIRTIL", "TOYNAK", "TAHTAKURUSU", "TEREYAĞKUŞU", "TERSİYER", "TURNA",
+    "USKUMRU", "UHU", "UÇANKEDİ", "VAŞAK", "VATOZ", "VOMBAT", "VAPİTİ", 
+    "YARASA", "YILAN", "YUNUS", "YENGEÇ", "YILKI", "YABANİDOMUZ", "YEDİUYUR", "YALITÇAPKINI", "ZEBRA", "ZÜRAFA"
+];

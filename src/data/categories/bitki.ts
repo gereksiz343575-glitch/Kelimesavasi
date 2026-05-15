@@ -1,0 +1,13 @@
+export const bitkiler = [
+    "AĞAÇ", "AKASYA", "ANANAS", "ARPA", "AYÇİÇEĞİ", "BADEM", "BAMBU", "BAMYA", "BEZELYE", "BUĞDAY", "BİBER", "BİBERİYE", 
+    "CEVİZ", "ÇAM", "ÇİLEK", "ÇİMEN", "ÇINAR", "DOMATES", "DEREOTU", "ELMA", "ERİK", "FASULYE", "FINDIK", "FISTIK", "GÜL", "HAVUÇ", "HURMA",
+    "IHLAMUR", "ISPANAK", "İNCİR", "KABAK", "KARPUZ", "KAVUN", "KAYISI", "KİRAZ", "KESTANE", "KAVAK", "LALE", "LİMON", "LAHANA",
+    "MANTAR", "MARUL", "MAYDANOZ", "MUZ", "MEŞE", "NANE", "NAR", "NOHUT", "NERGİS", "ORKİDE", "OT", "PALMİYE", "PAMUK", "PAPATYA", "PATATES", "PATLICAN", "PIRASA",
+    "PORTAKAL", "REZENE", "SARIMSAK", "SEMİZOTU", "SOĞAN", "SÖĞÜT", "ŞEFTALİ", "TURP", "UÇKUN", "ÜZÜM", "VİŞNE", "YONCA", "ZAKKUM", "ZEYTİN",
+    "AHUDUDU", "ALIÇ", "ALOEVERA", "ANTORYUM", "ARMUT", "AVOKADO", "AŞKMERDİVENİ", "AYVA", "BÖĞÜRTLEN", "BROKOLİ", "BÖRÜLCE", 
+    "CANERİK", "CİVANPERÇEMİ", "DEFNE", "EBEGÜMECİ", "EĞRELTİ", "ENGİNAR", "FESLEĞEN", "GİLABURU", "GİNSENG", "GÖKNAR", "GREYFURT", 
+    "GÜL", "HATAMİ", "HİNDİBÂ", "HOROZİBİĞİ", "ISIRGAN", "İĞDE", "KANOLA", "KARABİBER", "KARANFİL", "KARNABAHAR", "KEDİOTU", 
+    "KEKİK", "KETEN", "KİŞNİŞ", "KİVİ", "KUŞBURNU", "LADİN", "LAVANTA", "LEYLAK", "MAKAMBA", "MANDALİNA", "MENEKŞE", "MERCİMEK", 
+    "MISIR", "MUZ", "MÜRVER", "NİLÜFER", "OKALİPTÜS", "OLTACI", "PAPAYA", "PAZİ", "PEMBEGÜL", "PETUNYA", "SARDUNYA", "SARMAŞIK", 
+    "SÜMBÜL", "ŞAHTERE", "TAHIL", "TARÇIN", "TERE", "YASEMİN", "YENİDÜNYA", "ZAMBAK", "ZENCEFİL"
+];

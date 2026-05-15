@@ -1,0 +1,13 @@
+export const renkler = [
+    "AÇIK", "AK", "ALTIN", "AÇIKMAVİ", "BEYAZ", "BEJ", "BORDO", "BRONZ", "CAMGÖBEĞİ", "EFLATUN", "FİLDİŞİ", "FUŞYA", "GÜMÜŞ", "GRİ", 
+    "HAKİ", "KAHVERENGİ", "KIRMIZI", "KIZIL", "KOYU", "KREM", "LACİVERT", "LİLA", "MOR", "MAVİ", "PEMBE", "SARI", "SİYA", "SİYAH", "TURUNCU", "YEŞİL",
+    "AÇIKYEŞİL", "AÇIKPEMBE", "AÇIKSARI", "AHUDUDU", "ALTINSARISI", "AMETİST", "ANTRASİT", "AQUAMARİNE", "ATEŞKIRMIZISI", "AYIŞIĞI", 
+    "BEYAZIMSI", "BRONZ", "CEVİZ", "ÇAMYEŞİLİ", "ÇİMENYEŞİLİ", "ÇİKOLATA", "ÇİVİTMAVİSİ", "DENİZMAVİSİ", "EKRU", 
+    "ERGUVAN", "FİLDİŞİR", "FOSFORLU", "FÜME", "GECE MAVİSİ", "GÖKMAVİSİ", "GÜLKURUSU", "GÜMÜŞRENGİ", "GÜMÜŞ", "HAKİYEŞİL", "HARDAL", "HAVAN", 
+    "KAHVE", "KARANFİL", "KARPUZ", "KAVUNİÇİ", "KAYISI", "KEMİK", "KERPİÇ", "KINA", "KİREMİT", "KOBALT", "KOYUKAHVERENGİ", 
+    "KOYUKIRMIZI", "KOYUMAVİ", "KOYUMOR", "KOYUPEMBE", "KOYUSARI", "KOYUYEŞİL", "KREM", "KUMRAL", "KURŞUNİ", "KÜLRENGİ", 
+    "LAVANTA", "LİMONSARISI", "MERCAN", "MİNE", "NANE", "NARKIRMIZISI", "NEFTİ", "OKYANUS", "ORKİDE", "PARTOKAL", "PASTEL", 
+    "PATLICANMORU", "PEYGAMBERMAVİSİ", "PLATİN", "PUDRA", "SAKIZ", "SAMAN", "SARDUNYA", "SEDEF", "SİYAHIMSI", 
+    "SOMON", "SUYEŞİLİ", "SÜMBÜL", "ŞAMPANYA", "ŞARAP", "ŞEFTALİ", "TARÇIN", "TÜRKUAZ", "TURKUAZ", "URANYUM", "VİZON", "YAKUT", 
+    "YAVRUAĞZI", "YEŞİLİMSİ", "ZEYTİNYEŞİLİ", "ZÜMRÜT"
+];

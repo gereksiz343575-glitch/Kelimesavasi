@@ -1,0 +1,44 @@
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "./lib/firebase";
+
+import Login from "./pages/Login";
+import Menu from "./pages/Menu";
+import Friends from "./pages/Friends";
+import Game from "./pages/Game";
+import Leaderboard from "./pages/Leaderboard";
+
+export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  if (loading) {
+    return <div className="h-screen w-full flex items-center justify-center bg-zinc-950 text-zinc-400">Yükleniyor...</div>;
+  }
+
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen bg-zinc-950 text-zinc-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden shadow-black/50">
+          <Routes>
+            <Route path="/" element={user ? <Navigate to="/menu" /> : <Login />} />
+            <Route path="/menu" element={user ? <Menu /> : <Navigate to="/" />} />
+            <Route path="/friends" element={user ? <Friends /> : <Navigate to="/" />} />
+            <Route path="/leaderboard" element={user ? <Leaderboard /> : <Navigate to="/" />} />
+            <Route path="/game/:gameId" element={user ? <Game /> : <Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </div>
+      </div>
+    </BrowserRouter>
+  );
+}

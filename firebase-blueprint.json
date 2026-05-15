@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Guest user authentication document.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "isOnline": { "type": "boolean" },
+        "lastActive": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["uid", "displayName", "createdAt"]
+    },
+    "Game": {
+      "title": "Game",
+      "description": "Represents a 1v1 game session.",
+      "type": "object",
+      "properties": {
+        "status": { "type": "string", "enum": ["waiting", "active", "finished"] },
+        "player1Id": { "type": "string" },
+        "player2Id": { "type": "string" },
+        "turn": { "type": "string" },
+        "winnerId": { "type": "string" },
+        "category": { "type": "string" },
+        "letter": { "type": "string" },
+        "player1Words": { "type": "array" },
+        "player2Words": { "type": "array" },
+        "winner": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["status", "player1Id", "createdAt", "updatedAt"]
+    },
+    "Friend": {
+      "title": "Friend",
+      "description": "Friend user.",
+      "type": "object",
+      "properties": {
+        "friendId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["friendId", "createdAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Word category definition.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "letter": { "type": "string" },
+        "answers": { "type": "array" }
+      },
+      "required": ["name", "letter", "answers"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores guest user information."
+    },
+    "users/{userId}/friends/{friendId}": {
+      "schema": { "$ref": "#/entities/Friend" },
+      "description": "Stores user's friends."
+    },
+    "games/{gameId}": {
+      "schema": { "$ref": "#/entities/Game" },
+      "description": "Active and past games."
+    },
+    "categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Database of valid words for categories."
+    }
+  }
+}
