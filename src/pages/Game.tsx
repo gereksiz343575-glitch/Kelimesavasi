@@ -148,20 +148,21 @@ export default function Game() {
         }
 
         // Schedule next play
-        const nextDelay = Math.floor(Math.random() * 6000) + 7000; // Next move in 7-13 seconds
+        const nextDelay = Math.floor(Math.random() * 8000) + 10000; // Next move in 10-18 seconds
         timeoutId = setTimeout(playBot, nextDelay);
     };
 
-    timeoutId = setTimeout(playBot, 4000); // 4 seconds delay for the first move
+    timeoutId = setTimeout(playBot, 6000); // 6 seconds delay for the first move
 
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game?.status, gameId]);
 
   const joinGame = async () => {
-    if (!gameId || !auth.currentUser) return;
+    if (!gameId || !auth.currentUser || !gameRef.current) return;
     try {
-      const category = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
+      const g = gameRef.current;
+      const category = g.partyCategory || CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
       
       // Filter letters to only those that have at least one word in the chosen category
       let validLetters = LETTERS.filter(l => getPossibleWords(category, l).length > 0);
@@ -172,11 +173,13 @@ export default function Game() {
       
       const letter = validLetters[Math.floor(Math.random() * validLetters.length)];
       
+      const durationSecs = g.partyDuration || 60;
+
       await updateDoc(doc(db, "games", gameId), {
         status: "active",
         category,
         letter,
-        endsAt: Date.now() + 60000,
+        endsAt: Date.now() + durationSecs * 1000,
         updatedAt: serverTimestamp()
       });
     } catch (err) {
@@ -203,7 +206,8 @@ export default function Game() {
       });
 
       // Update user wins if there is a winner and this player is the winner to prevent double increments.
-      if (winnerId !== 'draw' && auth.currentUser?.uid === winnerId) {
+      // Do not add wins if the opponent is a bot
+      if (winnerId !== 'draw' && auth.currentUser?.uid === winnerId && gameObj.player2Id !== 'bot') {
         await updateDoc(doc(db, "users", winnerId), {
           wins: increment(1)
         });
@@ -216,6 +220,11 @@ export default function Game() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!word.trim() || !game || game.status !== "active" || timeLeft <= 0) return;
+
+    if (game.partyMode === "sequential" && game.turn !== auth.currentUser?.uid) {
+       setFeed(prev => [...prev, {id: Math.random().toString(), word: "SIRA SENDE DEĞİL!", isMine: true, status: 'wrong'}]);
+       return;
+    }
     
     const normalizedWord = toTrUpperCase(word.trim());
     setWord(""); // clear input instantly
@@ -242,10 +251,14 @@ export default function Game() {
     if (isValid) {
       const field = isPlayer1 ? 'player1Words' : 'player2Words';
       try {
-        await updateDoc(doc(db, "games", gameId as string), {
+        const updates: any = {
           [field]: arrayUnion(normalizedWord),
           updatedAt: serverTimestamp()
-        });
+        };
+        if (game.partyMode === "sequential") {
+          updates.turn = isPlayer1 ? game.player2Id : game.player1Id;
+        }
+        await updateDoc(doc(db, "games", gameId as string), updates);
       } catch (err) {
         console.error("Update failed", err);
       }
@@ -266,26 +279,26 @@ export default function Game() {
   const theme = myScore > oppScore ? "blue" : oppScore > myScore ? "red" : "zinc";
 
   return (
-    <div className="flex flex-col h-[650px] bg-zinc-900 overflow-hidden relative">
+    <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-900 border-zinc-800 transition-colors duration-1000 relative">
       {/* Background gradients for flavor */}
-      <div className={`absolute top-0 left-0 w-full h-48 bg-gradient-to-b opacity-40 transition-colors duration-1000 pointer-events-none 
-        ${theme === 'blue' ? 'from-blue-600/30' : theme === 'red' ? 'from-red-600/30' : 'from-zinc-500/20'} to-transparent`}></div>
+      <div className={`absolute top-0 left-0 w-full h-64 bg-gradient-to-b opacity-40 transition-colors duration-1000 pointer-events-none 
+        ${theme === 'blue' ? 'from-blue-600/20' : theme === 'red' ? 'from-red-600/20' : 'from-zinc-500/10'} to-transparent z-0`}></div>
       
       <div className="p-4 flex items-center justify-between z-10">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="hover:bg-zinc-800 focus:bg-zinc-800">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="hover:bg-zinc-800 text-zinc-300 focus:bg-zinc-800 shadow-none ring-0">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex flex-col items-center">
             {game.status === 'active' && (
-               <div className="flex flex-col items-center bg-zinc-950/80 px-4 py-2 rounded-2xl border border-zinc-800 shadow-xl">
-                 <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest mb-1">Kalan Süre</span>
-                 <span className={`text-2xl font-black ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : 'text-zinc-100'} font-mono`}>
+               <div className={`flex flex-col items-center bg-zinc-950/80 px-5 py-2 rounded-2xl border border-white/5 shadow-xl backdrop-blur-md transition-colors duration-500 ${timeLeft <= 10 ? 'ring-1 ring-red-500/50 shadow-red-500/20' : ''}`}>
+                 <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-0.5">Kalan Süre</span>
+                 <span className={`text-[22px] font-black ${timeLeft <= 10 ? 'text-red-400 animate-pulse drop-shadow-[0_0_8px_rgba(248,113,113,0.8)]' : timeLeft <= 30 ? 'text-amber-400' : 'text-white'} leading-none tracking-tight font-mono`}>
                     00:{timeLeft.toString().padStart(2, '0')}
                  </span>
                </div>
             )}
         </div>
-        <div className="w-9 h-9"></div> {/* Spacer to center the timer */}
+        <div className="w-10"></div> {/* Spacer to center the timer */}
       </div>
 
       { (game.status === "waiting" || game.status === "invited" || game.status === "looking") && (
@@ -331,6 +344,11 @@ export default function Game() {
                     <span className={`transition-all duration-500 flex items-center gap-2 ${myScore > oppScore ? 'text-blue-400 scale-105 font-black drop-shadow-[0_0_12px_rgba(59,130,246,0.6)] origin-left' : myScore < oppScore ? 'text-red-400/60 font-bold' : 'text-zinc-400 font-bold'}`}>
                       Sen: <span className="text-xl">{myScore}</span>
                     </span>
+                    {game.partyMode === "sequential" && (
+                       <span className={`text-[12px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${game.turn === auth.currentUser?.uid ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 animate-pulse' : 'bg-red-500/10 text-red-400/50 border border-red-500/20'}`}>
+                          {game.turn === auth.currentUser?.uid ? 'Sıra Sende' : 'Sıra Rakipte'}
+                       </span>
+                    )}
                     <span className={`transition-all duration-500 flex items-center gap-2 ${oppScore > myScore ? 'text-red-400 scale-105 font-black drop-shadow-[0_0_12px_rgba(244,63,94,0.6)] origin-right' : oppScore < myScore ? 'text-blue-400/60 font-bold' : 'text-zinc-400 font-bold'}`}>
                       Rakip: <span className="text-xl">{oppScore}</span>
                     </span>
@@ -360,19 +378,19 @@ export default function Game() {
             </div>
           </div>
 
-          <div className="p-4 bg-zinc-900 border-t border-zinc-800 shrink-0 z-20">
+          <div className="p-4 bg-zinc-900 border-t border-white/5 shrink-0 z-20">
             {game.status === "active" ? (
-              <form onSubmit={handleSubmit} className="flex space-x-3 relative max-w-sm mx-auto">
+              <form onSubmit={handleSubmit} className="flex space-x-3 relative items-center max-w-sm mx-auto">
                 <Input 
-                  placeholder="Kelime yaz ve enter'a bas..." 
+                  placeholder={game.partyMode === "sequential" && game.turn !== auth.currentUser?.uid ? "Rakip düşünuyor..." : "Kelime yaz ve enter'a bas..."} 
                   value={word}
                   onChange={e => setWord(e.target.value)}
-                  disabled={timeLeft <= 0}
-                  className="h-14 bg-zinc-950 border-zinc-700 text-lg rounded-2xl px-5 focus-visible:ring-blue-500 shadow-inner"
+                  disabled={timeLeft <= 0 || (game.partyMode === "sequential" && game.turn !== auth.currentUser?.uid)}
+                  className="h-14 bg-zinc-950/80 border-white/10 text-[15px] font-medium rounded-2xl px-5 focus-visible:ring-blue-500 shadow-inner"
                   autoFocus
                 />
-                <Button type="submit" size="icon" className="h-14 w-14 shrink-0 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl shadow-lg shadow-blue-500/20" disabled={timeLeft <= 0 || !word.trim()}>
-                  <Send className="h-5 w-5 ml-1" />
+                <Button type="submit" size="icon" className="h-14 w-14 shrink-0 bg-blue-500 hover:bg-blue-400 text-white rounded-2xl shadow-lg shadow-blue-500/20" disabled={timeLeft <= 0 || !word.trim() || (game.partyMode === "sequential" && game.turn !== auth.currentUser?.uid)}>
+                  <Send className="h-5 w-5 ml-0.5" />
                 </Button>
               </form>
             ) : game.status === "finished" ? (

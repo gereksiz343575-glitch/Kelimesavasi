@@ -2,8 +2,43 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['wins']) || 
+        request.resource.data.wins == resource.data.wins + 1
+      );
+      
+      match /friendRequests/{requesterId} {
+        allow create: if isSignedIn() && request.auth.uid == requesterId;
+        allow read, delete: if isOwner(userId) || isOwner(requesterId);
+      }
+      
+      match /friends/{friendId} {
+        allow read: if isOwner(userId);
+        allow create, delete: if isOwner(userId) || isOwner(friendId);
+      }
+    }
+    
+    match /games/{gameId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.player1Id == request.auth.uid;
+      allow update: if isSignedIn() && (
+        request.auth.uid == resource.data.player1Id || 
+        request.auth.uid == resource.data.player2Id || 
+        (resource.data.status == 'looking' && request.auth.uid != resource.data.player1Id) ||
+        ((resource.data.status == 'invited' || resource.data.status == 'party_invited') && request.auth.uid == resource.data.player2Id)
+      );
     }
   }
 }

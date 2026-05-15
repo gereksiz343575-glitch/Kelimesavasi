@@ -169,52 +169,53 @@ export default function Friends() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-zinc-900 border-zinc-800">
-      <div className="p-4 border-b border-zinc-800 flex items-center">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="mr-2">
+    <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-900/50">
+      <div className="p-4 border-b border-white/5 flex items-center bg-zinc-900/80">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="mr-2 hover:bg-zinc-800 text-zinc-300">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="font-bold text-lg">Arkadaşlar</h1>
+        <h1 className="font-bold text-lg text-white">Arkadaşlar</h1>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 pb-20">
         <form onSubmit={handleSearch} className="space-y-3">
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             <Input 
               placeholder="Oyuncu adı veya #ID ile ara..." 
               value={searchUsername}
               onChange={e => setSearchUsername(e.target.value)}
+              className="bg-zinc-900/50 border-white/5"
             />
-            <Button type="submit" disabled={loading}>
-              <Search className="h-4 w-4" />
+            <Button type="submit" disabled={loading} className="w-11 px-0 shadow-md">
+              <Search className="h-5 w-5" />
             </Button>
           </div>
-          {error && <p className={`text-xs ${error.includes('gönderildi') ? 'text-emerald-400' : 'text-red-400'}`}>{error}</p>}
+          {error && <p className={`text-xs font-medium px-2 ${error.includes('gönderildi') ? 'text-emerald-400' : 'text-red-400'}`}>{error}</p>}
         </form>
 
         {searchResult && (
-          <div className="p-4 bg-zinc-800 rounded-xl flex items-center justify-between border border-zinc-700">
-            <span className="font-medium text-zinc-200">
+          <div className="p-4 bg-zinc-800/60 rounded-2xl flex items-center justify-between border border-white/10 shadow-lg">
+            <span className="font-bold text-white flex items-center gap-2">
               {searchResult.displayName}
-              {searchResult.shortId && <span className="ml-2 text-[10px] bg-zinc-700 text-zinc-400 px-2 py-0.5 rounded-full ring-1 ring-zinc-600">#{searchResult.shortId}</span>}
+              {searchResult.shortId && <span className="text-[10px] bg-zinc-900 text-zinc-400 px-2 py-0.5 rounded-full ring-1 ring-white/5 font-medium">#{searchResult.shortId}</span>}
             </span>
-            <Button size="sm" onClick={handleSendRequest}><UserPlus className="h-4 w-4 mr-2"/> İstek Gönder</Button>
+            <Button size="sm" onClick={handleSendRequest} className="bg-blue-500 hover:bg-blue-400 text-white rounded-lg shadow-md"><UserPlus className="h-4 w-4 mr-2"/> İstek Gönder</Button>
           </div>
         )}
 
         {friendRequests.length > 0 && (
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider">Gelen İstekler ({friendRequests.length})</h2>
+            <h2 className="text-xs font-black text-emerald-400 uppercase tracking-widest pl-1">Gelen İstekler ({friendRequests.length})</h2>
             <div className="space-y-2">
               {friendRequests.map(req => (
-                <div key={req.id} className="flex items-center justify-between bg-zinc-950/50 p-3 rounded-lg border border-emerald-900/50">
-                  <span className="font-medium text-emerald-100">{req.displayName}</span>
+                <div key={req.id} className="flex items-center justify-between bg-zinc-900/80 p-3 rounded-2xl border border-emerald-500/20 shadow-sm">
+                  <span className="font-bold text-emerald-100 pl-1">{req.displayName}</span>
                   <div className="flex space-x-2">
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/20" onClick={() => handleAcceptRequest(req)}>
-                      <Check className="h-4 w-4" />
+                    <Button size="icon" variant="ghost" className="h-9 w-9 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg" onClick={() => handleAcceptRequest(req)}>
+                      <Check className="h-5 w-5" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-400/20" onClick={() => handleRejectRequest(req.id)}>
-                      <X className="h-4 w-4" />
+                    <Button size="icon" variant="ghost" className="h-9 w-9 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg" onClick={() => handleRejectRequest(req.id)}>
+                      <X className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
@@ -224,19 +225,21 @@ export default function Friends() {
         )}
 
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Arkadaş Listen ({friends.length})</h2>
+          <h2 className="text-xs font-black text-zinc-400 uppercase tracking-widest pl-1">Arkadaş Listen ({friends.length})</h2>
           {friends.length === 0 ? (
-            <p className="text-sm text-zinc-500 italic">Henüz hiç arkadaş eklemedin.</p>
+            <div className="bg-zinc-900/50 rounded-2xl p-6 text-center border border-white/5">
+                <p className="text-sm text-zinc-500 font-medium tracking-wide">Henüz arkadaş eklemedin.</p>
+            </div>
           ) : (
             <div className="space-y-2">
               {friends.map(friend => (
-                <div key={friend.id} className="flex items-center justify-between bg-zinc-950/50 p-3 rounded-lg border border-zinc-800/50">
-                  <span className="font-medium inline-flex items-center">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                <div key={friend.id} className="flex items-center justify-between bg-zinc-900/80 p-3 rounded-2xl border border-white/5 shadow-sm">
+                  <span className="font-bold inline-flex items-center text-zinc-200 pl-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 mr-3 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                     {friend.displayName}
                   </span>
-                  <Button size="sm" variant="outline" onClick={() => handleInvite(friend.friendId, friend.displayName)}>
-                    <Swords className="h-4 w-4 mr-2" />
+                  <Button size="sm" variant="outline" className="rounded-xl border-zinc-700 bg-zinc-800 hover:bg-zinc-700 hover:text-white text-zinc-300" onClick={() => handleInvite(friend.friendId, friend.displayName)}>
+                    <Swords className="h-4 w-4 mr-2 text-blue-400" />
                     Davet Et
                   </Button>
                 </div>
