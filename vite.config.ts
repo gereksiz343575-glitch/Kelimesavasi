@@ -13,18 +13,8 @@ export default defineConfig(({mode}) => {
       },
     },
     build: {
-      target: 'esnext',
-      minify: 'esbuild',
-      cssMinify: true,
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-            three: ['three', '@react-three/fiber', '@react-three/drei']
-          }
-        }
-      }
+      outDir: 'dist',
+      sourcemap: false
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.

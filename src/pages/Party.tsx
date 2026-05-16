@@ -4,7 +4,7 @@ import { doc, getDoc, updateDoc, onSnapshot, collection, query, getDocs } from "
 import { auth, db } from "../lib/firebase";
 import { Button } from "../components/ui/Button";
 import { Settings, Play, ArrowLeft, Users, UserPlus, X, ChevronDown, ChevronUp } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { CATEGORIES } from "../data/categories";
 import AvatarScene from "../components/AvatarScene";
 
