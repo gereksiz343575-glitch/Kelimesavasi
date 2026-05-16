@@ -6,7 +6,7 @@ import {defineConfig} from 'vite';
 export default defineConfig(({mode}) => {
   return {
     plugins: [react(), tailwindcss()],
-    base: '/', // Use absolute paths for Cloudflare Pages SPA routing
+    base: './', // Use relative paths for assets on Vercel/GitHub Pages
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
