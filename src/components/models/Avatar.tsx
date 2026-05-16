@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { RoundedBox } from '@react-three/drei';
+import { RoundedBox, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface AvatarProps {
@@ -8,26 +8,29 @@ interface AvatarProps {
   position: [number, number, number];
   isPlayer1: boolean;
   rotationY: number;
+  name?: string;
+  isOwner?: boolean;
 }
 
 const COLORS = {
-  skin: "#ffcd94",
+  skin: "#ffcd94", // warm skin
   male: {
-    shirt: "#3b82f6", // blue-500
-    pants: "#1e3a8a", // blue-900
-    hair: "#3f2b1a",
-    shoes: "#1e293b",
+    shirt: "#3b82f6", // clear blue
+    pants: "#1e3a8a", // dark blue
+    hair: "#3f2b1a",  // dark brown
+    shoes: "#1e293b", // slate
   },
   female: {
-    shirt: "#ec4899", // pink-500
-    pants: "#831843", // pink-900
-    hair: "#ca8a04",
-    shoes: "#f43f5e",
+    shirt: "#ec4899", // pink
+    pants: "#831843", // dark pink
+    hair: "#ca8a04",  // yellow brown / blonde
+    shoes: "#f43f5e", // light red
   }
 };
 
-export default function Avatar({ gender, position, isPlayer1, rotationY }: AvatarProps) {
+export default function Avatar({ gender, position, isPlayer1, rotationY, name }: AvatarProps) {
   const c = COLORS[gender];
+
   
   const group = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
@@ -43,150 +46,164 @@ export default function Avatar({ gender, position, isPlayer1, rotationY }: Avata
     const offset = isPlayer1 ? 0 : Math.PI;
 
     // Idle breathing (body goes up and down slightly)
-    body.current.position.y = Math.sin(t * 2 + offset) * 0.03 + 0.8;
+    body.current.position.y = Math.sin(t * 1.5 + offset) * 0.02 + 0.85;
     
     // Slight body sway
-    body.current.rotation.z = Math.sin(t * 1 + offset) * 0.015;
+    body.current.rotation.z = Math.sin(t * 1 + offset) * 0.01;
     body.current.rotation.x = Math.sin(t * 1.5 + offset) * 0.01;
 
-    // Head looks around slowly
+    // Head looks around gently
     if (head.current) {
-        head.current.rotation.y = Math.sin(t * 0.5 + offset) * 0.15;
-        head.current.rotation.x = Math.sin(t * 1.2 + offset) * 0.05;
+        head.current.rotation.y = Math.sin(t * 0.6 + offset) * 0.1;
+        head.current.rotation.x = Math.sin(t * 1.2 + offset) * 0.03;
     }
 
-    // Arms swing gently in opposite phase
+    // Arms swing gently
     if (armL.current) {
-        armL.current.rotation.x = Math.sin(t * 1.5 + offset) * 0.08;
-        armL.current.rotation.z = 0.05 + Math.sin(t * 0.8 + offset) * 0.03;
+        armL.current.rotation.x = Math.sin(t * 1.5 + offset) * 0.06;
+        armL.current.rotation.z = 0.1 + Math.sin(t * 0.8 + offset) * 0.02;
     }
     if (armR.current) {
-        armR.current.rotation.x = Math.sin(t * 1.5 + offset + Math.PI) * 0.08;
-        armR.current.rotation.z = -0.05 - Math.sin(t * 0.8 + offset) * 0.03;
+        armR.current.rotation.x = Math.sin(t * 1.5 + offset + Math.PI) * 0.06;
+        armR.current.rotation.z = -0.1 - Math.sin(t * 0.8 + offset) * 0.02;
     }
   });
 
   return (
-    <group ref={group} position={position} rotation-y={rotationY} scale={1.25}>
+    <group ref={group} position={position} rotation-y={rotationY} scale={1.1}>
       
-      {/* Upper Body (Bobs up and down) */}
-      <group ref={body} position={[0, 0.8, 0]}>
+      {/* Upper Body Segment */}
+      <group ref={body} position={[0, 0.85, 0]}>
+
+        {name && (
+          <Html position={[0, 1.05, 0]} center zIndexRange={[100, 0]}>
+            <div className={`px-4 py-2 rounded-full font-black shadow-xl border backdrop-blur-md whitespace-nowrap ${isPlayer1 ? 'bg-zinc-950/80 border-blue-500/50 text-blue-400' : 'bg-zinc-950/80 border-red-500/50 text-red-400'} text-base drop-shadow-lg`}>
+              {name}
+            </div>
+          </Html>
+        )}
         
-        {/* Torso */}
-        <RoundedBox args={[0.45, 0.5, 0.3]} radius={0.06} smoothness={4} castShadow receiveShadow>
-            <meshStandardMaterial color={c.shirt} roughness={0.7} />
+        {/* Core Torso */}
+        <RoundedBox args={[0.5, 0.55, 0.35]} radius={0.06} smoothness={4} castShadow receiveShadow>
+            <meshStandardMaterial color={c.shirt} roughness={0.6} />
         </RoundedBox>
 
         {/* Neck */}
         <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
-            <cylinderGeometry args={[0.06, 0.08, 0.15, 16]} />
+            <cylinderGeometry args={[0.07, 0.08, 0.1, 16]} />
             <meshStandardMaterial color={COLORS.skin} roughness={0.6} />
         </mesh>
 
-        {/* Head Group */}
-        <group ref={head} position={[0, 0.5, 0]}>
-           {/* Face */}
-           <RoundedBox args={[0.4, 0.4, 0.4]} radius={0.1} smoothness={4} castShadow receiveShadow position={[0, 0, 0]}>
+        {/* Head Pivot */}
+        <group ref={head} position={[0, 0.45, 0]}>
+           {/* Face Box */}
+           <RoundedBox args={[0.45, 0.45, 0.45]} radius={0.08} smoothness={4} castShadow receiveShadow position={[0, 0, 0]}>
                <meshStandardMaterial color={COLORS.skin} roughness={0.5} />
            </RoundedBox>
 
-           {/* Hair Base */}
-           <RoundedBox args={[0.42, 0.42, 0.42]} radius={0.1} smoothness={4} castShadow receiveShadow position={[0, 0.05, -0.02]}>
-               <meshStandardMaterial color={c.hair} roughness={0.8} />
+           {/* Core Hair volume */}
+           <RoundedBox args={[0.47, 0.45, 0.47]} radius={0.08} smoothness={4} castShadow receiveShadow position={[0, 0.06, -0.02]}>
+               <meshStandardMaterial color={c.hair} roughness={0.9} />
            </RoundedBox>
 
-           {/* Female Hair Extensions */}
+           {/* Hair Front Bangs */}
+           <RoundedBox args={[0.47, 0.15, 0.2]} radius={0.05} smoothness={4} castShadow receiveShadow position={[0, 0.18, 0.16]}>
+               <meshStandardMaterial color={c.hair} roughness={0.9} />
+           </RoundedBox>
+
+           {/* Female Extra Hair */}
            {gender === 'female' && (
-             <RoundedBox args={[0.46, 0.5, 0.2]} radius={0.1} smoothness={4} castShadow receiveShadow position={[0, -0.2, -0.15]}>
-                 <meshStandardMaterial color={c.hair} roughness={0.8} />
+             <RoundedBox args={[0.55, 0.55, 0.2]} radius={0.08} smoothness={4} castShadow receiveShadow position={[0, -0.2, -0.16]}>
+                 <meshStandardMaterial color={c.hair} roughness={0.9} />
              </RoundedBox>
            )}
 
-           {/* Eyes */}
-           <group position={[0, 0, 0.21]}>
-               <mesh position={[-0.08, 0.02, 0]}>
-                   <capsuleGeometry args={[0.015, 0.04, 8, 8]} />
+           {/* Detailed Eyes */}
+           <group position={[0, 0, 0.23]}>
+               <mesh position={[-0.1, 0.02, 0]}>
+                   <capsuleGeometry args={[0.015, 0.03, 16, 16]} />
                    <meshBasicMaterial color="#1f2937" />
                </mesh>
-               <mesh position={[0.08, 0.02, 0]}>
-                   <capsuleGeometry args={[0.015, 0.04, 8, 8]} />
+               <mesh position={[0.1, 0.02, 0]}>
+                   <capsuleGeometry args={[0.015, 0.03, 16, 16]} />
                    <meshBasicMaterial color="#1f2937" />
                </mesh>
            </group>
 
-           {/* Blush */}
-           <group position={[0, -0.05, 0.205]}>
-               <mesh position={[-0.12, 0, 0]}>
-                   <circleGeometry args={[0.03, 16]} />
+           {/* Blush details */}
+           <group position={[0, -0.06, 0.22]}>
+               <mesh position={[-0.14, 0, 0]}>
+                   <circleGeometry args={[0.035, 16]} />
                    <meshBasicMaterial color="#ef4444" transparent opacity={0.3} />
                </mesh>
-               <mesh position={[0.12, 0, 0]}>
-                   <circleGeometry args={[0.03, 16]} />
+               <mesh position={[0.14, 0, 0]}>
+                   <circleGeometry args={[0.035, 16]} />
                    <meshBasicMaterial color="#ef4444" transparent opacity={0.3} />
                </mesh>
            </group>
            
-           {/* Mouth */}
-           <mesh position={[0, -0.06, 0.21]}>
-               <capsuleGeometry args={[0.01, 0.02, 8, 8]} rotation={[0, 0, Math.PI / 2]} />
+           {/* Detailed Mouth */}
+           <mesh position={[0, -0.08, 0.22]} rotation={[0, 0, Math.PI / 2]}>
+               <capsuleGeometry args={[0.01, 0.02, 8, 8]} />
                <meshBasicMaterial color="#7f1d1d" />
            </mesh>
         </group>
 
-        {/* Left Arm */}
-        <group position={[-0.28, 0.2, 0]}>
+        {/* Left Arm Pivot structure */}
+        <group position={[-0.3, 0.2, 0]}>
             <group ref={armL}>
-                {/* Arm Base */}
-                <RoundedBox args={[0.12, 0.45, 0.12]} radius={0.06} smoothness={4} castShadow receiveShadow position={[0, -0.2, 0]}>
+                {/* Arm Skin segment */}
+                <RoundedBox args={[0.14, 0.45, 0.14]} radius={0.05} smoothness={4} castShadow receiveShadow position={[0, -0.2, 0]}>
                     <meshStandardMaterial color={COLORS.skin} roughness={0.6} />
                 </RoundedBox>
-                {/* Sleeve */}
-                <RoundedBox args={[0.14, 0.18, 0.14]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.05, 0]}>
+                {/* Sleeve layer overlying the arm */}
+                <RoundedBox args={[0.16, 0.2, 0.16]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.05, 0]}>
                     <meshStandardMaterial color={c.shirt} roughness={0.7} />
                 </RoundedBox>
             </group>
         </group>
 
-        {/* Right Arm */}
-        <group position={[0.28, 0.2, 0]}>
+        {/* Right Arm Pivot structure */}
+        <group position={[0.3, 0.2, 0]}>
             <group ref={armR}>
-                {/* Arm Base */}
-                <RoundedBox args={[0.12, 0.45, 0.12]} radius={0.06} smoothness={4} castShadow receiveShadow position={[0, -0.2, 0]}>
+                {/* Arm Skin */}
+                <RoundedBox args={[0.14, 0.45, 0.14]} radius={0.05} smoothness={4} castShadow receiveShadow position={[0, -0.2, 0]}>
                     <meshStandardMaterial color={COLORS.skin} roughness={0.6} />
                 </RoundedBox>
                 {/* Sleeve */}
-                <RoundedBox args={[0.14, 0.18, 0.14]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.05, 0]}>
+                <RoundedBox args={[0.16, 0.2, 0.16]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.05, 0]}>
                     <meshStandardMaterial color={c.shirt} roughness={0.7} />
                 </RoundedBox>
             </group>
         </group>
 
-        {/* Pelvis/Belt */}
-        <RoundedBox args={[0.42, 0.15, 0.28]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.25, 0]}>
+        {/* The Pelvis connecting the torso and legs */}
+        <RoundedBox args={[0.48, 0.18, 0.33]} radius={0.05} smoothness={4} castShadow receiveShadow position={[0, -0.32, 0]}>
             <meshStandardMaterial color={c.pants} roughness={0.8} />
         </RoundedBox>
       </group>
 
-      {/* Legs */}
+      {/* Legs (Stationary relative to the bobbing body) */}
       <group position={[0, 0.45, 0]}>
-          {/* Left Leg */}
-          <group ref={legL} position={[-0.12, 0, 0]}>
-              <RoundedBox args={[0.16, 0.35, 0.16]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.15, 0]}>
+          
+          {/* Left Leg Base */}
+          <group ref={legL} position={[-0.14, 0, 0]}>
+              <RoundedBox args={[0.18, 0.4, 0.18]} radius={0.05} smoothness={4} castShadow receiveShadow position={[0, -0.15, 0]}>
                   <meshStandardMaterial color={c.pants} roughness={0.8} />
               </RoundedBox>
               {/* Left Shoe */}
-              <RoundedBox args={[0.18, 0.12, 0.22]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.35, 0.02]}>
+              <RoundedBox args={[0.2, 0.14, 0.25]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.38, 0.03]}>
                   <meshStandardMaterial color={c.shoes} roughness={0.6} />
               </RoundedBox>
           </group>
 
-          {/* Right Leg */}
-          <group ref={legR} position={[0.12, 0, 0]}>
-              <RoundedBox args={[0.16, 0.35, 0.16]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.15, 0]}>
+          {/* Right Leg Base */}
+          <group ref={legR} position={[0.14, 0, 0]}>
+              <RoundedBox args={[0.18, 0.4, 0.18]} radius={0.05} smoothness={4} castShadow receiveShadow position={[0, -0.15, 0]}>
                   <meshStandardMaterial color={c.pants} roughness={0.8} />
               </RoundedBox>
               {/* Right Shoe */}
-              <RoundedBox args={[0.18, 0.12, 0.22]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.35, 0.02]}>
+              <RoundedBox args={[0.2, 0.14, 0.25]} radius={0.04} smoothness={4} castShadow receiveShadow position={[0, -0.38, 0.03]}>
                   <meshStandardMaterial color={c.shoes} roughness={0.6} />
               </RoundedBox>
           </group>

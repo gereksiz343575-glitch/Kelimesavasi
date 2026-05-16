@@ -96,15 +96,25 @@ export default function Party() {
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-950 relative">
       
-      {/* Back Button */}
-      <div className="absolute top-4 sm:top-5 left-4 sm:left-5 z-50 pointer-events-auto">
-          <Button variant="ghost" size="icon" onClick={leaveParty} className="bg-zinc-900/80 hover:bg-red-500 hover:text-white text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
-             <ArrowLeft className="h-5 w-5" />
-          </Button>
+      {/* Character Safe Area (3D Scene) */}
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <AvatarScene 
+          player1Avatar={party.player1Avatar} 
+          player1Name={party.player1Name}
+          player2Avatar={party.player2Id ? party.player2Avatar : null} 
+          player2Name={party.player2Id ? party.player2Name : undefined}
+        />
       </div>
 
-      {/* Top Bar */}
-      <div className="p-3 sm:p-5 pt-16 sm:pt-16 flex items-center justify-center z-10 shrink-0 relative bg-zinc-950/40 backdrop-blur-sm border-b border-white/5">
+      {/* Top Bar with Back Button */}
+      <div className="p-4 sm:p-5 pt-8 sm:pt-8 flex items-center justify-center z-10 shrink-0 relative bg-zinc-950/20 backdrop-blur-sm border-b border-white/5 pointer-events-none">
+        {/* Back Button - Fixed position inside relative top bar for proper layout */}
+        <div className="absolute left-4 sm:left-5 pointer-events-auto">
+            <Button variant="ghost" size="icon" onClick={leaveParty} className="bg-zinc-900/80 hover:bg-red-500 hover:text-white text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
+               <ArrowLeft className="h-5 w-5" />
+            </Button>
+        </div>
+
         <div className="flex items-center">
             <h1 className="font-black text-xl flex items-center text-white drop-shadow-md tracking-tight">
                <div className="bg-zinc-800 text-zinc-300 p-1.5 rounded-xl mr-3 shadow-md border border-white/10 ring-1 ring-black/20">
@@ -115,22 +125,15 @@ export default function Party() {
         </div>
       </div>
 
-      {/* Character Safe Area (3D Scene) */}
-      <div className="flex-1 relative z-0 w-full">
-        <AvatarScene 
-          player1Avatar={party.player1Avatar} 
-          player2Avatar={party.player2Id ? party.player2Avatar : null} 
-        />
-
-        {/* Floating Name Tags */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-between items-end px-4 sm:px-8 z-10 pointer-events-none">
+      <div className="flex-1 relative z-10 pointer-events-none flex flex-col justify-end pb-4">
+        {/* Action Buttons Container (floating above bottom panel) */}
+        <div className="flex justify-between items-end px-4 sm:px-8 w-full">
             <div className="flex flex-col items-center pointer-events-auto">
-               <span className="bg-zinc-950/80 backdrop-blur-sm text-blue-400 font-bold px-4 py-1.5 rounded-full border border-blue-500/30 shadow-lg">{party.player1Name}</span>
-               {isOwner && (
-                 <div className="flex mt-2 bg-zinc-950/80 backdrop-blur-md p-1 rounded-xl border border-white/10 shadow-lg relative overflow-hidden">
-                    <div className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-lg transition-transform duration-300 ease-out ${currentAvatar === 'male' ? 'translate-x-0 bg-blue-500 shadow-md' : 'translate-x-full bg-pink-500 shadow-md'}`} style={{ zIndex: 0 }}></div>
-                    <button onClick={() => selectAvatar('male')} className={`relative z-10 px-4 py-1.5 rounded-lg text-[11px] font-black tracking-widest transition-all w-20 flex justify-center items-center ${currentAvatar === 'male' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>ERKEK</button>
-                    <button onClick={() => selectAvatar('female')} className={`relative z-10 px-4 py-1.5 rounded-lg text-[11px] font-black tracking-widest transition-all w-20 flex justify-center items-center ${currentAvatar === 'female' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>KADIN</button>
+                {isOwner && (
+                 <div className="flex rounded-full overflow-hidden p-1 border border-white/10 shadow-lg relative bg-transparent">
+                    <div className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full transition-transform duration-300 ease-out ${currentAvatar === 'male' ? 'translate-x-0 bg-blue-500 shadow-md' : 'translate-x-full bg-pink-500 shadow-md'}`} style={{ zIndex: 0 }}></div>
+                    <button onClick={() => selectAvatar('male')} className={`relative z-10 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest transition-all w-20 flex justify-center items-center ${currentAvatar === 'male' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>ERKEK</button>
+                    <button onClick={() => selectAvatar('female')} className={`relative z-10 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest transition-all w-20 flex justify-center items-center ${currentAvatar === 'female' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>KADIN</button>
                  </div>
                )}
             </div>
@@ -138,21 +141,23 @@ export default function Party() {
             <div className="flex flex-col items-center pointer-events-auto">
                {party.player2Id ? (
                   <>
-                    <span className="bg-zinc-950/80 backdrop-blur-sm text-red-400 font-bold px-4 py-1.5 rounded-full border border-red-500/30 shadow-lg">{party.player2Name}</span>
                     {!isOwner && (
-                      <div className="flex mt-2 bg-zinc-950/80 backdrop-blur-md p-1 rounded-xl border border-white/10 shadow-lg relative overflow-hidden">
-                         <div className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-lg transition-transform duration-300 ease-out ${currentAvatar === 'male' ? 'translate-x-0 bg-blue-500 shadow-md' : 'translate-x-full bg-pink-500 shadow-md'}`} style={{ zIndex: 0 }}></div>
-                         <button onClick={() => selectAvatar('male')} className={`relative z-10 px-4 py-1.5 rounded-lg text-[11px] font-black tracking-widest transition-all w-20 flex justify-center items-center ${currentAvatar === 'male' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>ERKEK</button>
-                         <button onClick={() => selectAvatar('female')} className={`relative z-10 px-4 py-1.5 rounded-lg text-[11px] font-black tracking-widest transition-all w-20 flex justify-center items-center ${currentAvatar === 'female' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>KADIN</button>
+                      <div className="flex rounded-full overflow-hidden p-1 border border-white/10 shadow-lg relative bg-transparent">
+                         <div className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full transition-transform duration-300 ease-out ${currentAvatar === 'male' ? 'translate-x-0 bg-blue-500 shadow-md' : 'translate-x-full bg-pink-500 shadow-md'}`} style={{ zIndex: 0 }}></div>
+                         <button onClick={() => selectAvatar('male')} className={`relative z-10 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest transition-all w-20 flex justify-center items-center ${currentAvatar === 'male' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>ERKEK</button>
+                         <button onClick={() => selectAvatar('female')} className={`relative z-10 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest transition-all w-20 flex justify-center items-center ${currentAvatar === 'female' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>KADIN</button>
                       </div>
                     )}
                     {isOwner && (
-                      <button onClick={() => updateSetting('player2Id', '')} className="mt-2 text-[10px] text-red-400 bg-zinc-950/80 backdrop-blur-sm px-3 py-1 rounded-full border border-red-500/20 font-bold tracking-widest uppercase hover:bg-red-500 hover:text-white transition-all shadow-md">ÇIKAR</button>
+                      <button onClick={() => updateSetting('player2Id', '')} className="text-[10px] text-red-500 font-bold tracking-widest uppercase hover:text-red-400 transition-all flex items-center bg-transparent border-0 py-2">
+                        <X className="w-3 h-3 mr-1" />
+                        ÇIKAR
+                      </button>
                     )}
                   </>
                ) : (
-                  <button onClick={() => isOwner && setShowInviteModal(true)} disabled={!isOwner} className="bg-zinc-900/60 backdrop-blur-md border border-dashed border-zinc-600/50 hover:border-zinc-400 hover:bg-zinc-800/80 text-zinc-400 text-[13px] rounded-full px-4 py-1.5 font-semibold flex items-center transition-all group pointer-events-auto">
-                      <UserPlus className="w-4 h-4 mr-2" /> Arkadaş Davet Et
+                  <button onClick={() => isOwner && setShowInviteModal(true)} disabled={!isOwner} className="pointer-events-auto px-5 py-2.5 rounded-full font-black tracking-widest text-[11px] shadow-lg border border-white/20 text-zinc-300 hover:text-white hover:border-white/40 transition-all flex items-center bg-transparent drop-shadow-md">
+                      <UserPlus className="w-4 h-4 mr-2" /> ARKADAŞ DAVET ET
                   </button>
                )}
             </div>
@@ -161,7 +166,6 @@ export default function Party() {
 
       {/* Bottom CS2-style Panel */}
       <div className="relative z-20 shrink-0 bg-zinc-950/80 backdrop-blur-md px-4 pt-4 border-t border-white/10" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-         <div className="absolute bottom-full left-0 right-0 h-16 bg-gradient-to-t from-zinc-950/80 to-transparent pointer-events-none" />
          <div className="flex flex-col space-y-3 relative z-10 pointer-events-auto max-w-sm mx-auto w-full pb-2">
               
               {/* Settings Section */}

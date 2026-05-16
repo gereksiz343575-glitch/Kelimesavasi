@@ -276,13 +276,12 @@ export default function Game() {
   const amIWinner = game.winnerId === auth.currentUser?.uid;
   const isDraw = game.winnerId === 'draw';
   
-  const theme = myScore > oppScore ? "blue" : oppScore > myScore ? "red" : "zinc";
+  const theme = "zinc"; // Always neutral
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-950 border-zinc-900 transition-colors duration-1000 relative">
+    <div className="flex flex-col flex-1 h-full overflow-hidden bg-zinc-950 border-zinc-900 relative">
       {/* Background gradients for flavor */}
-      <div className={`absolute top-0 left-0 w-full h-64 bg-gradient-to-b opacity-40 transition-colors duration-1000 pointer-events-none 
-        ${theme === 'blue' ? 'from-blue-600/20' : theme === 'red' ? 'from-red-600/10' : 'from-zinc-500/10'} to-transparent z-0`}></div>
+      <div className={`absolute top-0 left-0 w-full h-64 bg-gradient-to-b opacity-40 pointer-events-none from-zinc-500/10 to-transparent z-0`}></div>
       
       <div className="absolute top-4 sm:top-5 left-4 sm:left-5 z-50 pointer-events-auto">
         <Button variant="ghost" size="icon" onClick={() => navigate("/menu")} className="bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
@@ -316,32 +315,26 @@ export default function Game() {
       {game.status !== "waiting" && game.status !== "invited" && game.status !== "looking" && (
         <>
           <div className="px-4 sm:px-6 py-2 z-10 shrink-0">
-             <div className={`flex justify-between items-center p-5 rounded-3xl shadow-lg transition-all duration-700 relative overflow-hidden
-                 ${theme === 'blue' ? 'bg-gradient-to-br from-blue-900/40 to-blue-950/40 border border-blue-800/40 shadow-[0_8px_30px_rgba(37,99,235,0.15)]' : 
-                   theme === 'red' ? 'bg-zinc-950/40 border border-red-900/20 shadow-[0_8px_30px_rgba(220,38,38,0.05)]' : 
-                   'bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-700/50 shadow-[0_8px_30px_rgba(0,0,0,0.2)]'} backdrop-blur-md`}>
+             <div className="flex justify-between items-center p-5 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.2)] bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-700/50 backdrop-blur-md relative overflow-hidden">
                  <div className="flex flex-col items-center w-1/3 z-10 relative">
-                    <span className={`text-[10px] uppercase font-black tracking-widest mb-1.5 transition-colors duration-500 ${theme === 'blue' ? 'text-blue-400/70' : theme === 'red' ? 'text-red-400/70' : 'text-zinc-500'}`}>Kategori</span>
-                    <span className={`text-[15px] font-black text-center uppercase transition-colors duration-500 leading-tight ${theme === 'blue' ? 'text-blue-300' : theme === 'red' ? 'text-red-300' : 'text-zinc-200'}`}>{game.category}</span>
+                    <span className="text-[10px] uppercase font-black tracking-widest mb-1.5 text-zinc-500">Kategori</span>
+                    <span className="text-[15px] font-black text-center uppercase leading-tight text-zinc-200">{game.category}</span>
                  </div>
-                 <div className={`flex flex-col items-center justify-center w-1/3 border-x transition-colors duration-700 space-y-1 z-10 ${theme === 'blue' ? 'border-blue-700/30' : theme === 'red' ? 'border-red-700/30' : 'border-zinc-700/50'}`}>
-                    <span className={`text-[10px] uppercase font-black tracking-widest transition-colors duration-500 ${theme === 'blue' ? 'text-blue-400/70' : theme === 'red' ? 'text-red-400/70' : 'text-zinc-500'}`}>Harf</span>
-                    <span className={`text-5xl font-black transition-colors duration-500 leading-none drop-shadow-xl ${theme === 'blue' ? 'text-blue-100' : theme === 'red' ? 'text-red-100' : 'text-white'}`}>{game.letter}</span>
+                 <div className="flex flex-col items-center justify-center w-1/3 border-x border-zinc-700/50 space-y-1 z-10">
+                    <span className="text-[10px] uppercase font-black tracking-widest text-zinc-500">Harf</span>
+                    <span className="text-5xl font-black leading-none drop-shadow-xl text-white">{game.letter}</span>
                  </div>
                  <div className="flex flex-col items-center justify-center w-1/3 text-center z-10">
-                    <span className={`text-[10px] uppercase font-black tracking-widest mb-1.5 transition-colors duration-500 ${theme === 'blue' ? 'text-blue-400/70' : theme === 'red' ? 'text-red-400/70' : 'text-zinc-500'}`}>Hedef</span>
-                    <span className={`text-[11px] font-bold uppercase leading-tight transition-colors duration-500 ${theme === 'blue' ? 'text-blue-200/80' : theme === 'red' ? 'text-red-200/80' : 'text-zinc-400'}`}>En çok kelime<br/>bulan kazanır</span>
+                    <span className="text-[10px] uppercase font-black tracking-widest mb-1.5 text-zinc-500">Hedef</span>
+                    <span className="text-[11px] font-bold uppercase leading-tight text-zinc-400">En çok kelime<br/>bulan kazanır</span>
                  </div>
              </div>
           </div>
 
           <div className="flex-1 overflow-hidden px-4 sm:px-6 pt-2 pb-2 z-10 flex flex-col">
-            <div className={`flex flex-col flex-1 rounded-3xl overflow-hidden border shadow-2xl transition-all duration-700 backdrop-blur-sm
-                ${myScore > oppScore ? 'bg-blue-950/20 border-blue-900/30 shadow-blue-900/5' : oppScore > myScore ? 'bg-zinc-950/40 border-red-900/10 shadow-red-900/5' : 'bg-zinc-950/50 border-zinc-800/80 shadow-black/20'}`}>
-                <div className={`p-4 font-medium flex items-center justify-between border-b transition-all duration-700
-                    ${myScore > oppScore ? 'bg-blue-900/20 border-blue-900/20' : oppScore > myScore ? 'bg-red-950/30 border-red-900/20' : 'bg-zinc-900/50 border-zinc-800/50'}
-                `}>
-                    <span className={`transition-all duration-500 flex items-center gap-2 ${myScore > oppScore ? 'text-blue-400 scale-105 font-black drop-shadow-[0_0_12px_rgba(59,130,246,0.6)] origin-left' : myScore < oppScore ? 'text-red-400/60 font-bold' : 'text-zinc-400 font-bold'}`}>
+            <div className="flex flex-col flex-1 rounded-3xl overflow-hidden border shadow-2xl backdrop-blur-sm bg-zinc-950/50 border-zinc-800/80 shadow-black/20">
+                <div className="p-4 font-medium flex items-center justify-between border-b bg-zinc-900/50 border-zinc-800/50">
+                    <span className="flex items-center gap-2 text-zinc-300 font-bold">
                       Sen: <span className="text-xl">{myScore}</span>
                     </span>
                     {game.partyMode === "sequential" && (
@@ -349,7 +342,7 @@ export default function Game() {
                           {game.turn === auth.currentUser?.uid ? 'Sıra Sende' : 'Sıra Rakipte'}
                        </span>
                     )}
-                    <span className={`transition-all duration-500 flex items-center gap-2 ${oppScore > myScore ? 'text-red-400 scale-105 font-black drop-shadow-[0_0_12px_rgba(244,63,94,0.6)] origin-right' : oppScore < myScore ? 'text-blue-400/60 font-bold' : 'text-zinc-400 font-bold'}`}>
+                    <span className="flex items-center gap-2 text-zinc-300 font-bold">
                       Rakip: <span className="text-xl">{oppScore}</span>
                     </span>
                 </div>
@@ -363,9 +356,9 @@ export default function Game() {
                         >
                             <div className={`flex items-center space-x-2 p-3 rounded-2xl border font-medium text-sm max-w-[85%]
                                 ${item.isMine ? 
-                                    (item.status === 'correct' ? 'bg-blue-950/50 border-blue-900/50 text-blue-100 rounded-tr-sm' : 
+                                    (item.status === 'correct' ? 'bg-emerald-950/40 border-emerald-900/50 text-emerald-100 rounded-tr-sm' : 
                                     'bg-red-950/50 border-red-900/50 text-red-100 line-through opacity-70 rounded-tr-sm') 
-                                : 'bg-zinc-800 border-zinc-700/50 text-zinc-100 rounded-tl-sm'}
+                                : (item.status === 'correct' ? 'bg-emerald-950/40 border-emerald-900/50 text-emerald-100 rounded-tl-sm' : 'bg-zinc-800 border-zinc-700/50 text-zinc-100 rounded-tl-sm')}
                             `}>
                                 <span className="break-all">{item.word}</span>
                                 {item.status === 'correct' && <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${item.isMine ? 'text-emerald-400 drop-shadow' : 'text-emerald-500'}`}/>}
@@ -394,21 +387,37 @@ export default function Game() {
                 </Button>
               </form>
             ) : game.status === "finished" ? (
-              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} 
-                className={`flex flex-col items-center p-6 rounded-3xl border shadow-2xl w-full
-                ${amIWinner ? 'bg-gradient-to-b from-blue-950/40 to-zinc-950/80 border-blue-900/20 shadow-[0_0_40px_rgba(30,58,138,0.15)]' : isDraw ? 'bg-zinc-950/80 border-white/5' : 'bg-gradient-to-b from-rose-950/40 to-zinc-950/80 border-rose-900/20 shadow-[0_0_40px_rgba(225,29,72,0.1)]'} backdrop-blur-md`}>
+              <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                className={`flex flex-col items-center p-8 rounded-[2rem] border shadow-2xl w-full max-w-sm mx-auto relative overflow-hidden
+                ${amIWinner ? 'bg-gradient-to-b from-blue-900/40 to-zinc-950 border-blue-800/30' : isDraw ? 'bg-zinc-900/80 border-white/10' : 'bg-gradient-to-b from-red-900/40 to-zinc-950 border-red-800/30'} backdrop-blur-xl`}>
                 
-                <Trophy className={`w-16 h-16 mb-4 drop-shadow-[0_0_15px_currentColor] ${amIWinner ? 'text-blue-400' : isDraw ? 'text-zinc-400' : 'text-rose-400'}`} />
+                {/* Background glow effects */}
+                <div className={`absolute top-0 inset-x-0 h-32 opacity-30 blur-2xl rounded-full ${amIWinner ? 'bg-blue-500' : isDraw ? 'bg-zinc-500' : 'bg-red-500'}`} />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/5 to-transparent pointer-events-none" />
+
+                <motion.div 
+                  initial={{ scale: 0, rotate: -180 }} 
+                  animate={{ scale: 1, rotate: 0 }} 
+                  transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.1 }}
+                  className={`flex items-center justify-center w-24 h-24 rounded-full mb-6 relative z-10 shadow-2xl
+                    ${amIWinner ? 'bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/30' : isDraw ? 'bg-gradient-to-tr from-zinc-600 to-zinc-400 shadow-zinc-500/30' : 'bg-gradient-to-tr from-red-600 to-red-400 shadow-red-500/30'}`}
+                >
+                    <Trophy className={`w-10 h-10 text-white drop-shadow-md`} />
+                </motion.div>
                 
-                <div className={`text-2xl font-black uppercase tracking-widest text-center drop-shadow-md ${amIWinner ? 'text-blue-400' : isDraw ? 'text-zinc-300' : 'text-rose-400'}`}>
+                <div className={`text-2xl font-black uppercase tracking-widest text-center mb-1 relative z-10 ${amIWinner ? 'text-blue-100' : isDraw ? 'text-zinc-100' : 'text-red-100'}`}>
                   {isDraw ? 'BERABERLİK!' : amIWinner ? 'SEN KAZANDIN!' : 'RAKİP KAZANDI!'}
                 </div>
                 
-                <div className="mt-2 text-zinc-400 text-sm font-bold tracking-wider">
+                <div className={`text-sm font-bold tracking-wider mb-8 relative z-10 ${amIWinner ? 'text-blue-300' : isDraw ? 'text-zinc-400' : 'text-red-300'}`}>
                   Skor: {myScore} - {oppScore}
                 </div>
                 
-                <Button variant="outline" className="mt-8 w-full h-14 rounded-2xl bg-zinc-900/80 border-white/10 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all shadow-sm font-black text-[15px]" onClick={() => navigate("/menu")}>
+                <Button variant="outline" className={`w-full h-14 rounded-2xl border transition-all shadow-sm font-black text-[15px] relative z-10 hover:-translate-y-0.5
+                    ${amIWinner ? 'bg-blue-950/50 border-blue-500/30 text-blue-200 hover:bg-blue-900/60 hover:border-blue-400/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 
+                      isDraw ? 'bg-zinc-900/80 border-zinc-600/50 text-zinc-300 hover:bg-zinc-800 hover:border-zinc-500/50 hover:shadow-[0_0_20px_rgba(161,161,170,0.2)]' : 
+                      'bg-red-950/50 border-red-500/30 text-red-200 hover:bg-red-900/60 hover:border-red-400/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]'}`} 
+                    onClick={() => navigate("/menu")}>
                     Ana Menüye Dön
                 </Button>
               </motion.div>

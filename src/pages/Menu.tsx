@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../lib/firebase";
 import { Button } from "../components/ui/Button";
-import { Users, Play, LogOut, Check, X, Trophy, Bot } from "lucide-react";
+import { Users, Play, LogOut, Check, X, Trophy, Bot, Swords } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { collection, query, where, onSnapshot, updateDoc, doc, getDocs, addDoc, serverTimestamp, limit, runTransaction } from "firebase/firestore";
@@ -256,37 +256,44 @@ export default function Menu() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-zinc-950 to-zinc-950 pointer-events-none" />
       <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '32px 32px' }} />
 
-      {/* Logout Button */}
-      <div className="absolute top-4 sm:top-5 right-4 sm:right-5 z-50 pointer-events-auto">
-        <Button variant="ghost" size="icon" onClick={handleLogout} title="Çıkış Yap" className="bg-zinc-900/80 hover:bg-red-500 hover:text-white text-zinc-300 backdrop-blur-md border border-white/10 transition-all shadow-lg rounded-full h-10 w-10">
-          <LogOut className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <div className="p-3 sm:p-4 pt-16 sm:pt-16 border-b border-white/5 flex items-center justify-between bg-zinc-900/50 backdrop-blur-md z-10 shrink-0">
-        <div className="flex items-center space-x-3">
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg border border-white/10">
-            <span className="text-white font-black text-lg">S</span>
+      {/* Floating Top Bar */}
+      <div className="absolute top-safe inset-x-0 mt-4 sm:mt-5 z-50 flex items-start justify-center pointer-events-none px-4">
+        
+        {/* Combined App Bar */}
+        <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-full p-1.5 pr-2 flex items-center shadow-2xl pointer-events-auto max-w-full overflow-hidden">
+          {/* Logo */}
+          <div className="bg-gradient-to-tr from-zinc-700 to-zinc-950 w-11 h-11 rounded-full flex items-center justify-center shadow-inner border border-white/20 mr-3 shrink-0 relative overflow-hidden">
+             <div className="absolute inset-0 bg-white/10 blur-[2px] rounded-full mix-blend-overlay"></div>
+             <span className="text-white font-black text-lg tracking-tighter italic drop-shadow-md z-10 relative left-[1px]">KS</span>
           </div>
-          <div className="flex flex-col">
-            <h1 className="font-extrabold text-lg flex items-center gap-2 text-white leading-none">
-                Sözcük Meydanı
+          
+          <div className="flex flex-col flex-1 min-w-0 mr-4">
+            <h1 className="font-extrabold text-[15px] text-white leading-tight truncate">
+                Kelime Savaşı
             </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-zinc-400 text-xs">Merhaba, <span className="text-blue-400 font-bold">{auth.currentUser?.displayName}</span></p>
+            <div className="flex items-center gap-2 mt-0.5 whitespace-nowrap">
+              <p className="text-zinc-300 text-[12px] truncate max-w-[80px] sm:max-w-[120px] font-medium"><span className="text-blue-400 font-bold">{auth.currentUser?.displayName}</span></p>
               {shortId && (
-                <div className="flex items-center bg-zinc-800/80 text-white px-1.5 py-0.5 rounded text-[10px] font-mono border border-white/10 shadow-sm">
+                <div className="flex items-center bg-black/40 text-white px-1.5 py-0.5 rounded-md text-[10px] font-mono border border-white/5 shadow-inner shrink-0">
                   <span className="text-zinc-500 mr-1">ID:</span>
-                  <span className="font-bold tracking-wider">{shortId}</span>
+                  <span className="font-bold tracking-wider text-blue-100">{shortId}</span>
                 </div>
               )}
             </div>
           </div>
-        </div>
-        
-        <div className="flex flex-col items-center bg-zinc-950/80 rounded-lg px-3 py-1 ring-1 ring-white/10 shadow-md">
+
+          {/* Stats Block */}
+          <div className="flex flex-col items-center bg-black/50 rounded-full px-4 py-1.5 ring-1 ring-white/5 shadow-inner shrink-0 mr-2">
             <span className="text-[8px] text-zinc-500 font-black tracking-widest uppercase mb-0.5">KAZANMA</span>
-            <span className="text-emerald-400 font-black text-base leading-none">{wins}</span>
+            <span className="text-emerald-400 font-black text-sm leading-none">{wins}</span>
+          </div>
+
+          <div className="w-px h-8 bg-zinc-800 shrink-0 mr-2"></div>
+
+          {/* Logout Button */}
+          <button onClick={handleLogout} title="Çıkış Yap" className="flex items-center justify-center hover:bg-red-500 hover:text-white text-zinc-400 bg-transparent transition-all shadow-none rounded-full h-10 w-10 shrink-0 border border-transparent hover:border-red-400/50">
+            <LogOut className="h-4 w-4 ml-0.5" />
+          </button>
         </div>
       </div>
 
@@ -330,7 +337,7 @@ export default function Menu() {
             </Button>
 
             <Button variant="outline" className="w-full h-14 text-[15px] font-black rounded-2xl bg-zinc-900/80 border-white/10 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all shadow-sm hover:scale-[1.02]" onClick={handleCustomMatch} disabled={loadingMatch}>
-            <Users className="mr-2 h-5 w-5" /> ÖZEL OYUN (PARTİ)
+            <Swords className="mr-2 h-5 w-5" /> ÖZEL OYUN (PARTİ)
             </Button>
 
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-white/5 mt-2">
