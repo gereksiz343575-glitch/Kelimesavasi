@@ -3,13 +3,25 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-window.addEventListener('error', (e) => {
-  console.error("Global error:", e.error);
+window.onerror = function(message, source, lineno, colno, error) {
   const rootObj = document.getElementById('root');
   if (rootObj && rootObj.innerHTML === '') {
-     rootObj.innerHTML = `<div style="color:red; padding:20px; font-family:sans-serif;">
-       <h3>Uygulamada bir hata oluştu</h3>
-       <pre>${e.error?.message || e.message}</pre>
+     rootObj.innerHTML = `<div style="color:red; padding:20px; font-family:sans-serif; text-align:left;">
+       <h3>Başlangıçta bir hata oluştu (Error)</h3>
+       <p>Mesaj: ${message}</p>
+       <p>Kaynak: ${source}:${lineno}:${colno}</p>
+       <pre>${error?.stack}</pre>
+     </div>`;
+  }
+};
+
+window.addEventListener('unhandledrejection', function(event) {
+  const rootObj = document.getElementById('root');
+  if (rootObj && rootObj.innerHTML === '') {
+     rootObj.innerHTML = `<div style="color:red; padding:20px; font-family:sans-serif; text-align:left;">
+       <h3>Bir asenkron işlem başarısız oldu (Promise Rejection)</h3>
+       <p>Neden: ${event.reason?.message || event.reason}</p>
+       <pre>${event.reason?.stack}</pre>
      </div>`;
   }
 });
